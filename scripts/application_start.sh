@@ -1,18 +1,11 @@
-#!/bin/bash
+source venv/bin/activate
 
-#give permission for everything in the express-app directory
-sudo chmod -R 777 /home/ec2-user/express-app
+# Set environment variables
+export FLASK_APP=your_flask_app
+export FLASK_ENV=production  # Change to "development" for development mode
 
-#navigate into our working directory where we have all our github files
-cd /home/ec2-user/express-app
+# Install dependencies (if needed)
+pip install -r requirements.txt
 
-#add npm and node to path
-export NVM_DIR="$HOME/.nvm"	
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # loads nvm	
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # loads nvm bash_completion (node is in path now)
-
-
-npm install
-
-#start our node app in the background
-node app.js > app.out.log 2> app.err.log < /dev/null & 
+# Start the Flask application
+flask run --host=0.0.0.0 --port=5000
