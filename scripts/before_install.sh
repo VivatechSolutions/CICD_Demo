@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Install Python and virtualenv
-sudo apt-get update
-sudo apt-get install -y python3 python3-pip
+sudo yum update
+sudo yum install -y python3 python3-pip
 pip3 install virtualenv
 
 # Create our working directory if it doesn't exist
