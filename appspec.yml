@@ -3,7 +3,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/Flask-app
+    destination: /home/ec2-user/Flask-App
 hooks:
   ApplicationStop:
     - location: scripts/application_stop.sh
