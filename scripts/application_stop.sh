@@ -1,4 +1,3 @@
 #!/bin/bash
-#Stopping existing node servers
-echo "Stopping any existing node servers"
-pkill node
+# Stop your Flask application if it's running
+sudo systemctl stop YourFlaskApp
