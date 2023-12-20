@@ -1,5 +1,5 @@
 from collections import deque
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from langchain.vectorstores import Qdrant
 from langchain.embeddings.openai import OpenAIEmbeddings
 import qdrant_client
@@ -76,30 +76,30 @@ def handle_userinput(user_question, conversation_chain):
     
     return response
 
-def main():
-    load_dotenv()
+# def main():
+#     load_dotenv()
 
-    chat_history = []
+#     chat_history = []
     
-    vector_store = get_vector_store()
-    conversation_chain = get_conversation_chain(vector_store)
+#     vector_store = get_vector_store()
+#     conversation_chain = get_conversation_chain(vector_store)
 
-    user_question = input("Ask a question about your documents:")
+#     user_question = input("Ask a question about your documents:")
 
-    while user_question.lower() not in ['quit', 'exit']:
-        response = handle_userinput(user_question, conversation_chain,chat_history)
+#     while user_question.lower() not in ['quit', 'exit']:
+#         response = handle_userinput(user_question, conversation_chain,chat_history)
         
-        # Display the conversation history
-        for message in chat_history:
-            if message['role'] == 'user':
-                print("You:", message['content'])
-            elif message['role'] == 'assistant':
-                print("Bot:", message['content'])
+#         # Display the conversation history
+#         for message in chat_history:
+#             if message['role'] == 'user':
+#                 print("You:", message['content'])
+#             elif message['role'] == 'assistant':
+#                 print("Bot:", message['content'])
         
-        user_question = input("Ask a question about your documents:")
+#         user_question = input("Ask a question about your documents:")
 
 if __name__ == '__main__':
-    load_dotenv()
+    # load_dotenv()
     app.run(host="0.0.0.0",port=5000,debug=True)
 
 
