@@ -1,8 +1,19 @@
-echo "Stopping script started at $(date)"
+#!/bin/bash
 
-# Stopping existing Flask servers
-echo "Stopping any existing Flask servers"
-pkill -f "gunicorn -b 0.0.0.0:5000"
+# Stop Gunicorn
+echo "Stopping Gunicorn server..."
+sudo pkill -f gunicorn
 
-# Log finish
-echo "Stopping script completed at $(date)"
+# Wait for Gunicorn to stop (adjust the sleep duration as needed)
+sleep 5
+
+# Verify that Gunicorn has stopped
+if pgrep -f gunicorn > /dev/null
+then
+  echo "Failed to stop Gunicorn."
+  exit 1
+else
+  echo "Gunicorn stopped successfully."
+fi
+
+exit 0
