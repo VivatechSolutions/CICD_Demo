@@ -1,3 +1,5 @@
 #!/bin/bash
-# Stop your Flask application if it's running
-sudo systemctl stop Flask-App
+
+# Stopping existing Flask servers
+echo "Stopping any existing Flask servers"
+pkill gunicorn
