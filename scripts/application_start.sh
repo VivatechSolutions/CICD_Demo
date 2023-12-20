@@ -1,7 +1,7 @@
-source venv/bin/activate
+#source venv/bin/activate
 
 # Set environment variables
-export FLASK_APP=your_flask_app
+export FLASK_APP=Flask-App
 export FLASK_ENV=production  # Change to "development" for development mode
 
 # Install dependencies (if needed)
