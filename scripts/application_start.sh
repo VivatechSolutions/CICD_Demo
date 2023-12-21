@@ -17,3 +17,6 @@ pip install -r requirements.txt
 
 python -m flask run --host=0.0.0.0 --port=5000 > app.out.log 2> app.err.log < /dev/null &
 
+
+#### try with this 
+#python3 app.py
