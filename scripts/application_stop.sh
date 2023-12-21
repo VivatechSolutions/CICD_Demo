@@ -6,6 +6,12 @@
 
 #!/bin/bash
 
+sudo yum erase codedeploy-agent
+cd /opt
+sudo rm -r codedeploy-agent/
+sudo rm -r Flask-App/
+sudo ./install auto
+
 # Stop the Flask application
 
 echo "Stopping any existing Flask servers"
@@ -21,8 +27,4 @@ pkill -9 -f "python -m flask run"
 
 #########################################################
 
-sudo yum erase codedeploy-agent
-cd /opt
-sudo rm -r codedeploy-agent/
-sudo rm -r Flask-App/
-sudo ./install auto
+
