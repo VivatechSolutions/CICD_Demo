@@ -1,3 +1,4 @@
 
 
-sudo rm -r Flask-App
+# sudo rm -r Flask-App
+pkill gunicorn
