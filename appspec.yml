@@ -5,7 +5,7 @@ files:
     destination: /home/ec2-user/Flask-App
 hooks:
   ApplicationStop:
-    - location: scripts/application_stop.sh
+    - location: scripts/application_start.sh
       timeout: 300
       runas: ec2-user
   BeforeInstall:
@@ -13,6 +13,6 @@ hooks:
       timeout: 300
       runas: ec2-user
   ApplicationStart:
-    - location: scripts/application_start.sh
+    - location: scripts/application_stop.sh
       timeout: 300
       runas: ec2-user
