@@ -7,7 +7,7 @@ sudo chmod -R 777 /home/ec2-user/Flask-App
 cd /home/ec2-user/Flask-App
 
 # Activate virtual environment
-#source venv/bin/activate
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
