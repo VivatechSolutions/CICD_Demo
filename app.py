@@ -100,7 +100,7 @@ def handle_userinput(user_question, conversation_chain):
 
 if __name__ == '__main__':
     # load_dotenv()
-    app.run(host="0.0.0.0",port=3000,debug=True)
+    app.run(host="0.0.0.0",port=5001,debug=True)
 
 
 
