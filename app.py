@@ -52,6 +52,10 @@ def get_conversation_chain(vector_store):
 def index():
     return 'Hello'
 
+@app.route('/env', methods=['GET'])
+def viva():
+    return SECRET_KEY
+
 @app.route('/apt',  methods=['POST'])
 def index1():
     return QDRANT_COLLECTION
