@@ -1,9 +1,11 @@
 from collections import deque
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
+load_dotenv()
 from langchain.vectorstores import Qdrant
 from langchain.embeddings.openai import OpenAIEmbeddings
 import qdrant_client
 import os
+
 import openai
 from flask import Flask, request, jsonify
 
@@ -18,6 +20,10 @@ MAX_HISTORY_LENGTH = 100  # Adjust the maximum history length as needed
 chat_history = deque(maxlen=MAX_HISTORY_LENGTH)
 
 os.environ["OPENAI_API_KEY"] = "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"
+day = os.getenv('day') 
+print(day)
+app.config['day'] = day
+
 
 QDRANT_HOST = "https://a07bb1c0-0275-4297-ae4a-c7610f2ade8c.us-east4-0.gcp.cloud.qdrant.io:6333"
 QDRANT_API_KEY = "M2y27uEHjgj0tdcT00h1Il_B2PHKV2eLIHdScov5dzjjT1mIvTJAmQ"
@@ -58,7 +64,7 @@ def index():
 
 @app.route('/apt',  methods=['POST'])
 def index1():
-    return 'hello'
+    return day
 
 @app.route('/ask', methods=['POST'])
 def ask_question():
