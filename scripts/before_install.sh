@@ -48,3 +48,4 @@ cd /home/ec2-user/Flask-App
 python3 -m virtualenv venv
 source venv/bin/activate
 
+
