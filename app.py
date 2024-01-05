@@ -17,7 +17,7 @@ app = Flask(__name__)
 MAX_HISTORY_LENGTH = 100  # Adjust the maximum history length as needed
 chat_history = deque(maxlen=MAX_HISTORY_LENGTH)
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 
 QDRANT_HOST = "https://a07bb1c0-0275-4297-ae4a-c7610f2ade8c.us-east4-0.gcp.cloud.qdrant.io:6333"
 QDRANT_API_KEY = "M2y27uEHjgj0tdcT00h1Il_B2PHKV2eLIHdScov5dzjjT1mIvTJAmQ"
