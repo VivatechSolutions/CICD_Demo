@@ -16,6 +16,7 @@ pip install -r requirements.txt
 
 pip install gunicorn
 
+pkill -f gunicorn
 
 # Start our Flask app in the background
 gunicorn -b 0.0.0.0:6000 app:app > app.out.log 2> app.err.log < /dev/null &
