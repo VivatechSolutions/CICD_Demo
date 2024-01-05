@@ -52,7 +52,7 @@ def get_conversation_chain(vector_store):
 def index():
     return 'Hello'
 
-@app.route('/env', methods=['GET'])
+@app.route('/env', methods=['POST'])
 def viva():
     return SECRET_KEY
 
