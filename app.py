@@ -58,7 +58,7 @@ def index():
 
 @app.route('/apt',  methods=['POST'])
 def index1():
-    return 'hello world'
+    return 'hello'
 
 @app.route('/ask', methods=['POST'])
 def ask_question():
