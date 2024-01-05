@@ -50,7 +50,7 @@ def get_conversation_chain(vector_store):
 
 @app.route('/')
 def index():
-    return 'Hello, World!'
+    return 'Hello'
 
 @app.route('/apt',  methods=['POST'])
 def index1():
