@@ -52,13 +52,13 @@ def get_conversation_chain(vector_store):
 def index():
     return 'Hello'
 
-@app.route('/env', methods=['POST'])
-def viva():
-    return SECRET_KEY
+# @app.route('/env', methods=['POST'])
+# def viva():
+#     return SECRET_KEY
 
 @app.route('/apt',  methods=['POST'])
 def index1():
-    return QDRANT_COLLECTION
+    return SECRET_KEY
 
 @app.route('/ask', methods=['POST'])
 def ask_question():
