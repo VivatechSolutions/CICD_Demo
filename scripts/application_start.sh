@@ -9,6 +9,8 @@ cd /home/ec2-user/Flask-App
 # Activate virtual environment
 source venv/bin/activate
 
+export SECRET_KEY="{{day}}"
+
 # Install dependencies
 pip install -r requirements.txt
 
