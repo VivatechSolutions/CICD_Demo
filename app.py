@@ -19,7 +19,7 @@ app = Flask(__name__)
 MAX_HISTORY_LENGTH = 100  # Adjust the maximum history length as needed
 chat_history = deque(maxlen=MAX_HISTORY_LENGTH)
 
-# os.environ["OPENAI_API_KEY"] = "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"
+
 
 day = os.getenv('day') 
 print(day)
