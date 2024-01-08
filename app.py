@@ -19,15 +19,15 @@ app = Flask(__name__)
 MAX_HISTORY_LENGTH = 100  # Adjust the maximum history length as needed
 chat_history = deque(maxlen=MAX_HISTORY_LENGTH)
 
-os.environ["OPENAI_API_KEY"] = "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"
+# os.environ["OPENAI_API_KEY"] = "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"
 day = os.getenv('day') 
 print(day)
 app.config['day'] = day
 
 
-QDRANT_HOST = "https://a07bb1c0-0275-4297-ae4a-c7610f2ade8c.us-east4-0.gcp.cloud.qdrant.io:6333"
-QDRANT_API_KEY = "M2y27uEHjgj0tdcT00h1Il_B2PHKV2eLIHdScov5dzjjT1mIvTJAmQ"
-QDRANT_COLLECTION = "gradeupai"
+# QDRANT_HOST = "https://a07bb1c0-0275-4297-ae4a-c7610f2ade8c.us-east4-0.gcp.cloud.qdrant.io:6333"
+# QDRANT_API_KEY = "M2y27uEHjgj0tdcT00h1Il_B2PHKV2eLIHdScov5dzjjT1mIvTJAmQ"
+# QDRANT_COLLECTION = "gradeupai"
 
 def get_vector_store():
     client = qdrant_client.QdrantClient(
