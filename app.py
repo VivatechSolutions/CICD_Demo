@@ -1,29 +1,26 @@
-from collections import deque
 from dotenv import load_dotenv
-load_dotenv()
 from langchain.vectorstores import Qdrant
 from langchain.embeddings.openai import OpenAIEmbeddings
 import qdrant_client
-import os
-
-import openai
-from flask import Flask, request, jsonify
-
-from langchain.memory import ConversationBufferMemory
+from flask import Flask, request, jsonify, session
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
+from pymongo import MongoClient
+from datetime import datetime
+import os
+import uuid
+from langchain.prompts.chat import SystemMessagePromptTemplate
 
 
 app = Flask(__name__)
-# Initialize chat history as a deque with a maximum length
-MAX_HISTORY_LENGTH = 100  # Adjust the maximum history length as needed
-chat_history = deque(maxlen=MAX_HISTORY_LENGTH)
+app.secret_key = "your_secret_key"  # Change this to a secure random value in production
+
+# MongoDB URI
+# mongodb_uri = "mongodb+srv://darshan:VG4inwNtIDZEvLrF@cluster1.4b09mmq.mongodb.net/?retryWrites=true&w=majority"
 
 
-
-day = os.getenv('day') 
-print(day)
-app.config['day'] = day
 
 QDRANT_HOST = os.getenv('QDRANT_HOST')
 app.config['QDRANT_HOST'] = QDRANT_HOST
@@ -31,96 +28,96 @@ QDRANT_API_KEY = os.getenv('QDRANT_API_KEY')
 app.config['QDRANT_API_KEY'] = QDRANT_API_KEY
 QDRANT_COLLECTION = os.getenv('QDRANT_COLLECTION')
 app.config['QDRANT_COLLECTION'] = QDRANT_COLLECTION
+mongodb_uri = os.getenv('mongodb_uri')
+app.config['mongodb_uri'] = QDRANT_HOST
 
+# Connect to MongoDB
+client = MongoClient(mongodb_uri)
+mongo_db = client['viva']
+mongo_collection = mongo_db['chat_history']
 
+def send_message(user, message):
+    timestamp = datetime.now()
+    data = {'user': user, 'message': message, 'timestamp': timestamp}
+    mongo_collection.insert_one(data)
 
+def get_chat_history(user):
+    mongo_history = mongo_collection.find({'user': user})
+    return [message['message'] for message in mongo_history]
 
-# QDRANT_HOST = "https://a07bb1c0-0275-4297-ae4a-c7610f2ade8c.us-east4-0.gcp.cloud.qdrant.io:6333"
-# QDRANT_API_KEY = "M2y27uEHjgj0tdcT00h1Il_B2PHKV2eLIHdScov5dzjjT1mIvTJAmQ"
-# QDRANT_COLLECTION = "gradeupai"
 
 def get_vector_store():
-    client = qdrant_client.QdrantClient(
-         QDRANT_HOST,
-        api_key=QDRANT_API_KEY
-    )
+    client = qdrant_client.QdrantClient(QDRANT_HOST, api_key=QDRANT_API_KEY)
     embeddings = OpenAIEmbeddings()
-    vector_store = Qdrant(
-        client=client,
-        collection_name=QDRANT_COLLECTION,
-        embeddings=embeddings,
-    )
+    vector_store = Qdrant(client=client, collection_name=QDRANT_COLLECTION, embeddings=embeddings)
     return vector_store
 
-def get_conversation_chain(vector_store):
-    llm = ChatOpenAI()
-    memory = ConversationBufferMemory(
-        memory_key='chat_history', return_messages=True
-    )
-    conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=vector_store.as_retriever(),
-        memory=memory
-    )
-    return conversation_chain
+template = """
+    Use the following context (delimited by <ctx></ctx>) and the chat history (delimited by <hs></hs>) to answer the question:
+    The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details only from its context and it will suggest some information based on the provided context. If the question is out of context, AI  replies back  with it is out of context.
+    {context}
+    </ctx>
+    ------
+    <hs>
+    {chat_history}
+    </hs>
+    ------
+    {question}
+    Answer:
+    """
 
-@app.route('/')
-def index():
-    return 'Hello'
+prompt = PromptTemplate(input_variables=["chat_history", "context", "question"], template=template)
 
-# @app.route('/env', methods=['POST'])
-# def viva():
-#     return SECRET_KEY
+from openai.error import OpenAIError
 
-@app.route('/apt',  methods=['POST'])
-def index1():
-    return day
+def get_conversation_chain(vector_store, prompt):
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')
+    print(memory)
+    user_id = get_or_create_user_id()
+    chat_history = get_chat_history(user_id)
+    print(chat_history)
+    # print("Is chat_history a list of strings?", all(isinstance(msg, str) for msg in chat_history))
+    formatted_chat_history = [{'message': msg} for msg in chat_history]
+    print("Formatted chat history:", formatted_chat_history)
+
+    try:
+        qa = ConversationalRetrievalChain.from_llm(
+            ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5, max_tokens=100),
+            retriever=vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5, "include_metadata": True}),
+            return_source_documents=True,
+            verbose=True,
+            chain_type="stuff",
+            get_chat_history=lambda h: formatted_chat_history,
+            combine_docs_chain_kwargs={'prompt': prompt},
+            memory=memory
+        )
+        return qa
+    except OpenAIError as e:
+        # Handle rate limit error
+        print("OpenAI API Rate Limit Exceeded. Please wait and retry later.")
+        raise
+
 
 @app.route('/ask', methods=['POST'])
 def ask_question():
     user_question = request.json['question']
-    conversation_chain = get_conversation_chain(get_vector_store())
-    
-    response = handle_userinput(user_question, conversation_chain)
-    
+    user_id = get_or_create_user_id()
+    conversation_chain1 = get_conversation_chain(get_vector_store(), prompt)
+    response = handle_userinput(user_question, conversation_chain1, user_id)
     return jsonify({'response': response['answer']})
-    
-    
 
+def get_or_create_user_id():
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+    return session['user_id']
 
-def handle_userinput(user_question, conversation_chain):
-    response = conversation_chain({'question': user_question})
-    
-    chat_history.append({'role': 'user', 'content': user_question})
-    chat_history.append({'role': 'assistant', 'content': response['answer']})
-    
-    return response
+def handle_userinput(user_question, conversation_chain1, user_id):
+    chat_history = get_chat_history(user_id)
+    response = conversation_chain1({'question': user_question, 'chat_history': chat_history})
+    send_message(user_id, user_question)
+    send_message(user_id, response['answer'])
+    return {"answer": response['answer']}
 
-# def main():
-#     load_dotenv()
-
-#     chat_history = []
-    
-#     vector_store = get_vector_store()
-#     conversation_chain = get_conversation_chain(vector_store)
-
-#     user_question = input("Ask a question about your documents:")
-
-#     while user_question.lower() not in ['quit', 'exit']:
-#         response = handle_userinput(user_question, conversation_chain,chat_history)
-        
-#         # Display the conversation history
-#         for message in chat_history:
-#             if message['role'] == 'user':
-#                 print("You:", message['content'])
-#             elif message['role'] == 'assistant':
-#                 print("Bot:", message['content'])
-        
-#         user_question = input("Ask a question about your documents:")
 
 if __name__ == '__main__':
-    # load_dotenv()
-    app.run(host="0.0.0.0",port=6000,debug=True)
-
-
-
+    app.run(host="0.0.0.0", port=5000, debug=True)
