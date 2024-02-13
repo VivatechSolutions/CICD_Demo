@@ -84,7 +84,7 @@ def get_conversation_chain(vector_store, prompt):
 
     try:
         qa = ConversationalRetrievalChain.from_llm(
-            ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5, max_tokens=100),
+            ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5, max_tokens=200),
             retriever=vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5, "include_metadata": True}),
             return_source_documents=True,
             verbose=True,
