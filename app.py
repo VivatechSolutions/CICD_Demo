@@ -44,7 +44,7 @@ def send_message(user, message):
     mongo_collection.insert_one(data)
 
 def get_chat_history(user):
-    mongo_history = mongo_collection.find({'user': user})
+    mongo_history = mongo_collection.find({'user': "f8786ba3-802e-4a13-bad3-ffc2cfa1cb69"})
     return [message['message'] for message in mongo_history]
 
 
