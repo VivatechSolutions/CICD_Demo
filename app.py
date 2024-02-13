@@ -20,6 +20,7 @@ app.secret_key = "your_secret_key"  # Change this to a secure random value in pr
 # MongoDB URI
 # mongodb_uri = "mongodb+srv://darshan:VG4inwNtIDZEvLrF@cluster1.4b09mmq.mongodb.net/?retryWrites=true&w=majority"
 
+OPENAI_API_KEY= os.getenv('OPENAI_API_KEY')
 
 
 QDRANT_HOST = os.getenv('QDRANT_HOST')
