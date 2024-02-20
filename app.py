@@ -39,17 +39,17 @@ template = """
     </ctx>
     ------
     <hs>
-    {chatHistory}
+    {chat_history}
     </hs>
     ------
     {question}
     Answer:
     """
 
-prompt = PromptTemplate(input_variables=["chatHistory", "context", "question"], template=template)
+prompt = PromptTemplate(input_variables=["chat_history", "context", "question"], template=template)
 
-def get_conversation_chain(vector_store, prompt, chatHistory):
-    memory = ConversationBufferMemory(memory_key='chatHistory', return_messages=True, output_key='answer')
+def get_conversation_chain(vector_store, prompt, chat_history):
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')
 
     try:
         qa = ConversationalRetrievalChain.from_llm(
@@ -58,7 +58,7 @@ def get_conversation_chain(vector_store, prompt, chatHistory):
             return_source_documents=True,
             verbose=True,
             chain_type="stuff",
-            get_chatHistory=lambda h: chatHistory,
+            get_chat_history=lambda h: chat_history,
             combine_docs_chain_kwargs={'prompt': prompt},
             memory=memory
         )
@@ -71,10 +71,10 @@ def get_conversation_chain(vector_store, prompt, chatHistory):
 def ask_question():
     request_data = request.json
     user_question = request_data['question']
-    chatHistory = request_data['chatHistory']
+    chat_history = request_data['chat_history']
 
-    conversation_chain1 = get_conversation_chain(get_vector_store(), prompt, chatHistory)
-    response = handle_user_input(user_question, conversation_chain1, chatHistory)
+    conversation_chain1 = get_conversation_chain(get_vector_store(), prompt, chat_history)
+    response = handle_user_input(user_question, conversation_chain1, chat_history)
     
     return jsonify({'response': response['answer']})
 
@@ -82,16 +82,16 @@ def ask_question():
 def ask_question_v1():
     request_data = request.json
     user_question = request_data['question']
-    chatHistory = request_data['chatHistory']
+    chat_history = request_data['chat_history']
 
-    conversation_chain1 = get_conversation_chain(get_vector_store(), prompt, chatHistory)
-    response = handle_user_input(user_question, conversation_chain1, chatHistory)
+    conversation_chain1 = get_conversation_chain(get_vector_store(), prompt, chat_history)
+    response = handle_user_input(user_question, conversation_chain1, chat_history)
     
     return jsonify({'response': response['answer']})
 
 
-def handle_user_input(user_question, conversation_chain1, chatHistory):
-    response = conversation_chain1({'question': user_question, 'chatHistory': chatHistory})
+def handle_user_input(user_question, conversation_chain1, chat_history):
+    response = conversation_chain1({'question': user_question, 'chat_history': chat_history})
     return {"answer": response['answer']}
 
 if __name__ == '__main__':
