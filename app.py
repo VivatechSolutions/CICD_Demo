@@ -49,12 +49,13 @@ template = """
 
 prompt = PromptTemplate(input_variables=["chat_history", "context", "question"], template=template)
 
+
 def get_conversation_chain(vector_store, prompt, chat_history):
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')
 
     try:
         qa = ConversationalRetrievalChain.from_llm(
-            ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5, max_tokens=200),
+            ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.6, max_tokens=200),
             retriever=vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5, "include_metadata": True}),
             return_source_documents=True,
             verbose=True,
