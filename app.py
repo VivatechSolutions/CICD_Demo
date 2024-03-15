@@ -17,6 +17,8 @@ app = Flask(__name__)
 secret_key = os.urandom(24)
 app.secret_key = secret_key.hex()
 
+# app.secret_key = "your_secret_key"  # Change this to a secure random value in production
+
 # Qdrant configuration
 QDRANT_HOST = os.getenv('QDRANT_HOST')
 app.config['QDRANT_HOST'] = QDRANT_HOST
@@ -32,13 +34,8 @@ def get_vector_store():
     return vector_store
 
 template = """
-    Use the following context (delimited by <ctx></ctx>) and the chat history (delimited by <hs></hs>) to answer the question:
-    You are a gentle AI designed for educational conversations with students to act as a teacher .
-    You provide information based on the stored context  on the database for answers. 
-    If a question is outside the stored context, you should reply with 'I don't have information on that topic.' 
-    Additionally, you should be able to provide summaries of topics and generate your own questions based on the mentioned topic and give suggestions for 1 marks, 2 marks, 5 marks and 10 marks questions if asked.
-    However, it is crucial to remember that you should only answer based on the information stored in documents.
-    Clearly understand the question and continue following the conversation chain based on previous interactions 
+    Use the following context (delimited by <ctx></ctx>) and the chat_history {chat_history} (delimited by <hs></hs>) to answer the question:
+    The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details only from its context and it will suggest some information based on the provided context. If the question is out of context, AI  replies back  with it is out of context.And dont answer for aws related.And please give insights,suggestions for 2marks,5marks,10 marks and problem statements from the topics if the questions is related to context.
     {context}
     </ctx>
     ------
@@ -63,8 +60,10 @@ condense_question_template = """
 """
 condense_question_prompt = PromptTemplate.from_template(condense_question_template)
 
+
 def get_conversation_chain(vector_store, prompt, chat_history):
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')
+    print(chat_history)
 
     try:
         qa = ConversationalRetrievalChain.from_llm(
