@@ -17,8 +17,6 @@ app = Flask(__name__)
 secret_key = os.urandom(24)
 app.secret_key = secret_key.hex()
 
-# app.secret_key = "your_secret_key"  # Change this to a secure random value in production
-
 # Qdrant configuration
 QDRANT_HOST = os.getenv('QDRANT_HOST')
 app.config['QDRANT_HOST'] = QDRANT_HOST
@@ -54,6 +52,16 @@ template = """
 
 prompt = PromptTemplate(input_variables=["chat_history", "context", "question"], template=template)
 
+condense_question_template = """
+    Return text in the original language of the follow up question.
+    If the follow up question does not need context, return the exact same text back.
+    Never rephrase the follow up question given the chat history unless the follow up question needs context.
+    
+    Chat History: {chat_history}
+    Follow Up question: {question}
+    Standalone question:
+"""
+condense_question_prompt = PromptTemplate.from_template(condense_question_template)
 
 def get_conversation_chain(vector_store, prompt, chat_history):
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')
@@ -65,6 +73,7 @@ def get_conversation_chain(vector_store, prompt, chat_history):
             return_source_documents=True,
             verbose=True,
             chain_type="stuff",
+            condense_question_prompt=condense_question_prompt,
             get_chat_history=lambda h: chat_history,
             combine_docs_chain_kwargs={'prompt': prompt},
             memory=memory
